@@ -4,7 +4,7 @@ import { useImage } from '@/context/ImageContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Upload, Camera, Loader2 } from 'lucide-react';
-import { toast } from '@/components/ui/sonner';
+import { toast } from 'sonner';
 
 const ImageUploader = () => {
   const { uploadImage, loading } = useImage();
