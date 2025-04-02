@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Mushroom, User, LogOut, Settings, Home } from 'lucide-react';
+import { Leaf, User, LogOut, Settings, Home } from 'lucide-react';
 
 const Header = () => {
   const { currentUser, logout, isAdmin } = useAuth();
@@ -20,7 +20,7 @@ const Header = () => {
     <header className="border-b bg-white dark:bg-gray-900">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <Link to="/" className="flex items-center gap-2">
-          <Mushroom size={24} className="text-mushroom-primary" />
+          <Leaf size={24} className="text-mushroom-primary" />
           <span className="text-xl font-bold">Mushroom SafeGuard</span>
         </Link>
         

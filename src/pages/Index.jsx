@@ -3,7 +3,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/Layout/MainLayout';
 import { Button } from '@/components/ui/button';
-import { Search, Mushroom, AlertCircle, FileText, Upload } from 'lucide-react';
+import { Search, Leaf, AlertCircle, FileText, Upload } from 'lucide-react';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -33,7 +33,7 @@ const Index = () => {
         <div className="container px-4 py-16 md:py-24 lg:py-32">
           <div className="flex flex-col items-center text-center">
             <div className="flex items-center mb-4">
-              <Mushroom size={40} className="text-mushroom-primary mr-2" />
+              <Leaf size={40} className="text-mushroom-primary mr-2" />
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight">
                 Mushroom SafeGuard
               </h1>

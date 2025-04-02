@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Mushroom } from 'lucide-react';
+import { Leaf } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Footer = () => {
@@ -9,7 +9,7 @@ const Footer = () => {
       <div className="container flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-2">
-            <Mushroom size={20} className="text-mushroom-primary" />
+            <Leaf size={20} className="text-mushroom-primary" />
             <span className="text-lg font-bold">Mushroom SafeGuard</span>
           </div>
           <p className="text-sm text-muted-foreground">
