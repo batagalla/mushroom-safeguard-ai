@@ -2,7 +2,7 @@
 import React from 'react';
 import MainLayout from '@/components/Layout/MainLayout';
 import { Card, CardContent } from '@/components/ui/card';
-import { Mushroom, AlertCircle, Book, HeartHandshake } from 'lucide-react';
+import { Leaf, AlertCircle, Book, HeartHandshake } from 'lucide-react';
 
 const AboutPage = () => {
   return (
@@ -10,7 +10,7 @@ const AboutPage = () => {
       <section className="container py-12 md:py-16">
         <div className="max-w-3xl mx-auto">
           <div className="flex items-center justify-center mb-6">
-            <Mushroom size={32} className="text-mushroom-primary mr-3" />
+            <Leaf size={32} className="text-mushroom-primary mr-3" />
             <h1 className="text-3xl md:text-4xl font-bold">About Mushroom SafeGuard</h1>
           </div>
           
