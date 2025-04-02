@@ -1,6 +1,6 @@
 
 import React, { createContext, useState, useContext } from 'react';
-import { toast } from '@/components/ui/sonner';
+import { toast } from 'sonner';
 import { useAuth } from './AuthContext';
 
 const FeedbackContext = createContext();
