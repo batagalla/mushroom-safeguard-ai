@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import MainLayout from '@/components/Layout/MainLayout';
 import ImageUploader from '@/components/Identification/ImageUploader';
@@ -12,7 +12,15 @@ import { LogIn } from 'lucide-react';
 
 const IdentifyPage = () => {
   const { currentUser } = useAuth();
-  const { selectedImage, classification } = useImage();
+  const { selectedImage, classification, setSelectedImage, setClassification } = useImage();
+  
+  // Reset selected image and classification when component unmounts
+  useEffect(() => {
+    return () => {
+      setSelectedImage(null);
+      setClassification(null);
+    };
+  }, []);
   
   // If user is not logged in, show a prompt to login
   if (!currentUser) {

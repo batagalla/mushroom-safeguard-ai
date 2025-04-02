@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import MainLayout from '@/components/Layout/MainLayout';
 import { useAuth } from '@/context/AuthContext';
@@ -8,17 +8,31 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import FeedbackList from '@/components/Feedback/FeedbackList';
-import { User, FileImage } from 'lucide-react';
+import { User, FileImage, Loader2 } from 'lucide-react';
 
 const ProfilePage = () => {
   const { currentUser, logout } = useAuth();
-  const { getUserImages } = useImage();
+  const { fetchUserImages, getUserImages } = useImage();
+  const [userImages, setUserImages] = useState([]);
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() => {
+    const loadUserData = async () => {
+      if (currentUser) {
+        setLoading(true);
+        await fetchUserImages();
+        const images = await getUserImages(currentUser.id);
+        setUserImages(images);
+        setLoading(false);
+      }
+    };
+    
+    loadUserData();
+  }, [currentUser]);
   
   if (!currentUser) {
     return <Navigate to="/login" replace />;
   }
-  
-  const userImages = getUserImages(currentUser.id);
 
   return (
     <MainLayout>
@@ -70,7 +84,11 @@ const ProfilePage = () => {
             </TabsList>
             
             <TabsContent value="identifications" className="space-y-6">
-              {userImages.length === 0 ? (
+              {loading ? (
+                <div className="flex justify-center items-center p-8">
+                  <Loader2 className="h-8 w-8 animate-spin text-mushroom-primary" />
+                </div>
+              ) : userImages.length === 0 ? (
                 <Card className="border-dashed">
                   <CardContent className="p-6 text-center">
                     <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-muted">
@@ -91,11 +109,11 @@ const ProfilePage = () => {
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {userImages.map((image) => (
-                    <Card key={image.id} className="overflow-hidden">
+                    <Card key={image._id} className="overflow-hidden">
                       <div className="aspect-square relative">
                         <img 
                           src={image.url}
-                          alt={`Mushroom ${image.id}`}
+                          alt={`Mushroom ${image._id}`}
                           className="object-cover w-full h-full"
                         />
                         {image.analyzed && (
@@ -119,7 +137,7 @@ const ProfilePage = () => {
             </TabsContent>
             
             <TabsContent value="feedback">
-              <FeedbackList userId={currentUser.id} />
+              <FeedbackList userId={currentUser.id} isAdmin={false} />
             </TabsContent>
           </Tabs>
         </div>

@@ -85,7 +85,7 @@ const ClassificationResult = ({ result, image }) => {
         </CardFooter>
       </Card>
       
-      {showFeedback && <FeedbackForm imageId={image.id} />}
+      {showFeedback && <FeedbackForm imageId={image._id} />}
     </div>
   );
 };

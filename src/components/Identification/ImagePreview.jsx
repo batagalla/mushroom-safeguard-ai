@@ -11,7 +11,7 @@ const ImagePreview = ({ image }) => {
   if (!image) return null;
 
   const handleAnalyze = async () => {
-    await analyzeImage(image.id);
+    await analyzeImage(image._id);
   };
 
   return (

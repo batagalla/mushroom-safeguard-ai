@@ -1,7 +1,8 @@
 
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useEffect, useContext } from 'react';
 import { toast } from 'sonner';
 import { useAuth } from './AuthContext';
+import api from '../services/api';
 
 const ImageContext = createContext();
 
@@ -12,6 +13,33 @@ export const ImageProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const { currentUser } = useAuth();
 
+  // Fetch user images when user changes
+  useEffect(() => {
+    if (currentUser) {
+      fetchUserImages();
+    } else {
+      // Clear images when user logs out
+      setImages([]);
+      setSelectedImage(null);
+      setClassification(null);
+    }
+  }, [currentUser]);
+
+  const fetchUserImages = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get('/images');
+      setImages(response.data);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching images:", error);
+      toast.error("Failed to load images");
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const uploadImage = async (file) => {
     if (!currentUser) {
       toast.error("You need to be logged in to upload images");
@@ -20,26 +48,26 @@ export const ImageProvider = ({ children }) => {
 
     setLoading(true);
     try {
-      // In a real application, this would upload to cloudinary via your backend
-      // For demo purposes, we're using local URLs
-      const imageUrl = URL.createObjectURL(file);
+      // Create form data to send the file
+      const formData = new FormData();
+      formData.append('image', file);
+
+      const response = await api.post('/images/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
       
-      const newImage = {
-        id: Date.now().toString(),
-        userId: currentUser.id,
-        url: imageUrl,
-        fileName: file.name,
-        uploadDate: new Date().toISOString(),
-        analyzed: false
-      };
-      
+      const newImage = response.data;
       setImages((prevImages) => [...prevImages, newImage]);
       setSelectedImage(newImage);
       toast.success("Image uploaded successfully");
       return { success: true, image: newImage };
     } catch (error) {
-      toast.error("Failed to upload image");
-      return { success: false, error: error.message };
+      console.error("Image upload error:", error);
+      const message = error.response?.data?.message || "Failed to upload image";
+      toast.error(message);
+      return { success: false, error: message };
     } finally {
       setLoading(false);
     }
@@ -48,47 +76,51 @@ export const ImageProvider = ({ children }) => {
   const analyzeImage = async (imageId) => {
     setLoading(true);
     try {
-      // Find the image
-      const image = images.find(img => img.id === imageId);
-      if (!image) {
-        throw new Error("Image not found");
-      }
-      
-      // In a real application, this would make an API call to your AI model
-      // For demo purposes, we're randomly determining if it's edible or poisonous
-      const isEdible = Math.random() > 0.5;
-      
-      const result = {
-        id: Date.now().toString(),
-        imageId,
-        classification: isEdible ? "edible" : "poisonous",
-        confidence: Math.round(Math.random() * 50 + 50) / 100, // Random confidence between 0.5 and 1
-        details: isEdible 
-          ? "This mushroom appears to be safe for consumption. However, always verify with multiple sources before consuming any wild mushroom." 
-          : "This mushroom appears to be poisonous. Do not consume and wash your hands if you've handled it.",
-        date: new Date().toISOString()
-      };
+      const response = await api.post(`/images/analyze/${imageId}`);
       
       // Update the image to mark it as analyzed
       setImages(prevImages => 
         prevImages.map(img => 
-          img.id === imageId ? { ...img, analyzed: true } : img
+          img._id === imageId ? { ...img, analyzed: true, classification: response.data._id } : img
         )
       );
       
-      setClassification(result);
+      // Fetch the complete image with populated classification
+      const imageResponse = await api.get(`/images/${imageId}`);
+      const updatedImage = imageResponse.data;
+      
+      setSelectedImage(updatedImage);
+      setClassification(updatedImage.classification);
       toast.success("Analysis complete");
-      return { success: true, result };
+      return { success: true, result: updatedImage.classification };
     } catch (error) {
-      toast.error("Failed to analyze image");
-      return { success: false, error: error.message };
+      console.error("Image analysis error:", error);
+      const message = error.response?.data?.message || "Failed to analyze image";
+      toast.error(message);
+      return { success: false, error: message };
     } finally {
       setLoading(false);
     }
   };
 
-  const getUserImages = (userId) => {
-    return images.filter(img => img.userId === userId);
+  const getImage = async (imageId) => {
+    try {
+      const response = await api.get(`/images/${imageId}`);
+      return { success: true, image: response.data };
+    } catch (error) {
+      console.error("Error fetching image:", error);
+      return { success: false, error: error.response?.data?.message || "Error fetching image" };
+    }
+  };
+
+  const getUserImages = async (userId) => {
+    try {
+      const userImages = images.filter(img => img.user === userId || img.user._id === userId);
+      return userImages;
+    } catch (error) {
+      console.error("Error filtering user images:", error);
+      return [];
+    }
   };
 
   const value = {
@@ -100,7 +132,9 @@ export const ImageProvider = ({ children }) => {
     loading,
     uploadImage,
     analyzeImage,
-    getUserImages
+    getUserImages,
+    fetchUserImages,
+    getImage
   };
 
   return (

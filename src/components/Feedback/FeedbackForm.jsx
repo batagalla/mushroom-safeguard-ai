@@ -14,8 +14,10 @@ const FeedbackForm = ({ imageId }) => {
     e.preventDefault();
     if (!text.trim()) return;
     
-    await submitFeedback(imageId, text);
-    setText('');
+    const result = await submitFeedback(imageId, text);
+    if (result.success) {
+      setText('');
+    }
   };
 
   return (

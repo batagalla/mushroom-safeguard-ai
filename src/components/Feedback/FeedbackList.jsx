@@ -1,17 +1,46 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useFeedback } from '@/context/FeedbackContext';
 import { useAuth } from '@/context/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
-import { MessageCircle, Check, X } from 'lucide-react';
+import { MessageCircle, Check, X, Loader2 } from 'lucide-react';
 
 const FeedbackList = ({ userId, isAdmin = false }) => {
-  const { getAllFeedback, getUserFeedback, updateFeedbackStatus } = useFeedback();
+  const { getAllFeedback, getUserFeedback, updateFeedbackStatus, fetchFeedback, loading } = useFeedback();
+  const [feedbackList, setFeedbackList] = useState([]);
+  const [loadingFeedback, setLoadingFeedback] = useState(true);
+  const { currentUser } = useAuth();
   
-  const feedbackList = isAdmin ? getAllFeedback() : getUserFeedback(userId);
+  useEffect(() => {
+    const loadFeedback = async () => {
+      setLoadingFeedback(true);
+      await fetchFeedback();
+      
+      let fbList;
+      if (isAdmin) {
+        fbList = getAllFeedback();
+      } else {
+        fbList = await getUserFeedback(userId);
+      }
+      setFeedbackList(fbList);
+      setLoadingFeedback(false);
+    };
+    
+    if (currentUser) {
+      loadFeedback();
+    }
+  }, [currentUser, userId, isAdmin]);
+
+  if (loadingFeedback) {
+    return (
+      <div className="flex justify-center items-center p-8">
+        <Loader2 className="h-8 w-8 animate-spin text-mushroom-primary" />
+      </div>
+    );
+  }
 
   if (feedbackList.length === 0) {
     return (
@@ -29,18 +58,20 @@ const FeedbackList = ({ userId, isAdmin = false }) => {
     );
   }
 
-  const handleUpdateStatus = (feedbackId, newStatus) => {
-    updateFeedbackStatus(feedbackId, newStatus);
+  const handleUpdateStatus = async (feedbackId, newStatus) => {
+    await updateFeedbackStatus(feedbackId, newStatus);
   };
 
   return (
     <div className="space-y-4">
       {feedbackList.map((feedback) => (
-        <Card key={feedback.id}>
+        <Card key={feedback._id}>
           <CardHeader className="pb-3">
             <div className="flex items-start justify-between">
               <div>
-                <CardTitle className="text-base">{feedback.userName || 'Anonymous'}</CardTitle>
+                <CardTitle className="text-base">
+                  {feedback.user.name || feedback.userName || 'Anonymous'}
+                </CardTitle>
                 <p className="text-xs text-muted-foreground">
                   {new Date(feedback.date).toLocaleString()}
                 </p>
@@ -63,26 +94,40 @@ const FeedbackList = ({ userId, isAdmin = false }) => {
               <div className="mt-4 flex items-center gap-2">
                 <Button 
                   size="sm" 
-                  onClick={() => handleUpdateStatus(feedback.id, 'approved')}
+                  onClick={() => handleUpdateStatus(feedback._id, 'approved')}
+                  disabled={loading}
                   className="h-8 bg-green-600 hover:bg-green-700 text-white"
                 >
-                  <Check className="mr-1 h-4 w-4" />
-                  Approve
+                  {loading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <>
+                      <Check className="mr-1 h-4 w-4" />
+                      Approve
+                    </>
+                  )}
                 </Button>
                 <Button 
                   size="sm" 
-                  onClick={() => handleUpdateStatus(feedback.id, 'rejected')}
+                  onClick={() => handleUpdateStatus(feedback._id, 'rejected')}
+                  disabled={loading}
                   className="h-8 bg-red-600 hover:bg-red-700 text-white"
                 >
-                  <X className="mr-1 h-4 w-4" />
-                  Reject
+                  {loading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <>
+                      <X className="mr-1 h-4 w-4" />
+                      Reject
+                    </>
+                  )}
                 </Button>
               </div>
             )}
             
             <Separator className="my-4" />
             <p className="text-xs text-muted-foreground">
-              Feedback ID: {feedback.id.substring(0, 8)}...
+              Feedback ID: {feedback._id}
             </p>
           </CardContent>
         </Card>
