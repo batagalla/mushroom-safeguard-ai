@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Leaf, User, LogOut, Settings, Home, Menu } from 'lucide-react';
+import { Leaf, User, LogOut, Settings, Home, Menu, LogIn, UserPlus } from 'lucide-react';
 
 const Header = () => {
   const { currentUser, logout, isAdmin } = useAuth();
@@ -77,6 +77,29 @@ const Header = () => {
                 <User className="inline mr-2 h-4 w-4" />
                 About
               </Link>
+              
+              {/* Add login/signup links for mobile when user is not logged in */}
+              {!currentUser && (
+                <>
+                  <div className="border-t my-2"></div>
+                  <Link 
+                    to="/login" 
+                    className="text-base font-medium px-4 py-2 hover:bg-gray-100 rounded-md text-mushroom-primary"
+                    onClick={closeMobileMenu}
+                  >
+                    <LogIn className="inline mr-2 h-4 w-4" />
+                    Log In
+                  </Link>
+                  <Link 
+                    to="/register" 
+                    className="text-base font-medium px-4 py-2 bg-mushroom-primary text-white hover:bg-mushroom-dark rounded-md"
+                    onClick={closeMobileMenu}
+                  >
+                    <UserPlus className="inline mr-2 h-4 w-4" />
+                    Sign Up
+                  </Link>
+                </>
+              )}
             </div>
           </SheetContent>
         </Sheet>
@@ -133,6 +156,11 @@ const Header = () => {
               <Link to="/register">
                 <Button size="sm" className="bg-mushroom-primary hover:bg-mushroom-dark hidden md:inline-flex">
                   Sign Up
+                </Button>
+              </Link>
+              <Link to="/login" className="md:hidden">
+                <Button variant="ghost" size="icon" className="relative h-8 w-8 rounded-full">
+                  <User className="h-5 w-5" />
                 </Button>
               </Link>
             </>
