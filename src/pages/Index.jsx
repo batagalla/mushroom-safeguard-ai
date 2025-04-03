@@ -1,9 +1,8 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/Layout/MainLayout';
 import { Button } from '@/components/ui/button';
-import { Search, Leaf, AlertCircle, FileText, Upload } from 'lucide-react';
+import { Search, Leaf, AlertCircle, FileText, Upload, StarIcon, Star } from 'lucide-react';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -24,6 +23,27 @@ const Index = () => {
       title: 'Detailed Information',
       description: 'Learn about different mushroom species, their characteristics, and edibility status.',
     },
+  ];
+
+  const testimonials = [
+    {
+      name: "Sarah Johnson",
+      role: "Mushroom Enthusiast",
+      content: "This app saved me from a potential mistake while foraging. The quick identification gave me confidence in determining which mushrooms were safe to collect.",
+      rating: 5
+    },
+    {
+      name: "Michael Chen",
+      role: "Amateur Forager",
+      content: "The AI analysis is impressively accurate. I cross-referenced with my guidebooks and it was spot on every time. Definitely my go-to tool now when I'm out in the woods.",
+      rating: 5
+    },
+    {
+      name: "Emma Davis",
+      role: "Hiking Guide",
+      content: "I teach mushroom identification basics on my tours, and this app has become an essential tool. The clear warnings and detailed information help my clients learn safely.",
+      rating: 4
+    }
   ];
 
   return (
@@ -135,6 +155,36 @@ const Index = () => {
               Start Identifying Now
             </Button>
           </div>
+        </div>
+      </section>
+
+      {/* User Testimonials Section */}
+      <section className="container px-4 py-16">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold mb-2">User Testimonials</h2>
+          <p className="text-muted-foreground max-w-[700px] mx-auto">
+            See what our community of foragers and mushroom enthusiasts have to say about Mushroom SafeGuard.
+          </p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {testimonials.map((testimonial, index) => (
+            <div key={index} className="bg-white rounded-lg p-6 shadow-md border border-gray-100">
+              <div className="flex mb-2">
+                {[...Array(5)].map((_, i) => (
+                  <Star 
+                    key={i} 
+                    size={16} 
+                    className={i < testimonial.rating ? "fill-amber-400 text-amber-400" : "text-gray-300"} 
+                  />
+                ))}
+              </div>
+              <p className="text-gray-700 italic mb-4">"{testimonial.content}"</p>
+              <div className="mt-auto">
+                <p className="font-semibold">{testimonial.name}</p>
+                <p className="text-sm text-mushroom-primary">{testimonial.role}</p>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 

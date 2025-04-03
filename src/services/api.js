@@ -21,4 +21,17 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+// User profile API methods
+api.updateUserProfile = async (userId, userData) => {
+  try {
+    const response = await api.put(`/users/${userId}`, userData);
+    return { success: true, user: response.data };
+  } catch (error) {
+    return { 
+      success: false, 
+      error: error.response?.data?.message || 'Failed to update profile' 
+    };
+  }
+};
+
 export default api;

@@ -10,6 +10,7 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import IdentifyPage from "./pages/IdentifyPage";
 import ProfilePage from "./pages/ProfilePage";
+import MyIdentificationsPage from "./pages/MyIdentificationsPage";
 import AdminPage from "./pages/AdminPage";
 import AboutPage from "./pages/AboutPage";
 import { AuthProvider } from "./context/AuthContext";
@@ -33,6 +34,7 @@ const App = () => (
                 <Route path="/register" element={<RegisterPage />} />
                 <Route path="/identify" element={<IdentifyPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
+                <Route path="/my-identifications" element={<MyIdentificationsPage />} />
                 <Route path="/admin" element={<AdminPage />} />
                 <Route path="/about" element={<AboutPage />} />
                 <Route path="*" element={<NotFound />} />
