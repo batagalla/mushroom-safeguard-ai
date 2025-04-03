@@ -1,4 +1,3 @@
-
 const express = require('express');
 const router = express.Router();
 const { body, validationResult } = require('express-validator');
@@ -109,6 +108,28 @@ router.get('/image/:imageId', authenticate, async (req, res) => {
     const feedback = await Feedback.find({ image: req.params.imageId })
       .populate('user', 'name')
       .sort({ date: -1 });
+
+    res.json(feedback);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// @route   GET api/feedback/recent
+// @desc    Get recent feedback for public display
+// @access  Public
+router.get('/recent', async (req, res) => {
+  try {
+    // Fetch recent approved feedback (limit to 6)
+    const feedback = await Feedback.find({ status: 'approved' })
+      .populate('user', 'name')
+      .populate({
+        path: 'image',
+        populate: { path: 'classification' },
+      })
+      .sort({ date: -1 })
+      .limit(6);
 
     res.json(feedback);
   } catch (err) {

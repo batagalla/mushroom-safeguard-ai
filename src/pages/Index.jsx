@@ -1,11 +1,31 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/Layout/MainLayout';
 import { Button } from '@/components/ui/button';
-import { Search, Leaf, AlertCircle, FileText, Upload, StarIcon, Star } from 'lucide-react';
+import { Search, Leaf, AlertCircle, FileText, Upload, MessageSquare } from 'lucide-react';
+import api from '@/services/api';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const Index = () => {
   const navigate = useNavigate();
+  const [recentFeedback, setRecentFeedback] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchRecentFeedback = async () => {
+      try {
+        setLoading(true);
+        const response = await api.get('/feedback/recent');
+        setRecentFeedback(response.data);
+      } catch (error) {
+        console.error('Failed to fetch recent feedback:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRecentFeedback();
+  }, []);
 
   const features = [
     {
@@ -23,27 +43,6 @@ const Index = () => {
       title: 'Detailed Information',
       description: 'Learn about different mushroom species, their characteristics, and edibility status.',
     },
-  ];
-
-  const testimonials = [
-    {
-      name: "Sarah Johnson",
-      role: "Mushroom Enthusiast",
-      content: "This app saved me from a potential mistake while foraging. The quick identification gave me confidence in determining which mushrooms were safe to collect.",
-      rating: 5
-    },
-    {
-      name: "Michael Chen",
-      role: "Amateur Forager",
-      content: "The AI analysis is impressively accurate. I cross-referenced with my guidebooks and it was spot on every time. Definitely my go-to tool now when I'm out in the woods.",
-      rating: 5
-    },
-    {
-      name: "Emma Davis",
-      role: "Hiking Guide",
-      content: "I teach mushroom identification basics on my tours, and this app has become an essential tool. The clear warnings and detailed information help my clients learn safely.",
-      rating: 4
-    }
   ];
 
   return (
@@ -158,33 +157,75 @@ const Index = () => {
         </div>
       </section>
 
-      {/* User Testimonials Section */}
+      {/* Recent User Feedback Section */}
       <section className="container px-4 py-16">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold mb-2">User Testimonials</h2>
+          <h2 className="text-3xl font-bold mb-2">Community Feedback</h2>
           <p className="text-muted-foreground max-w-[700px] mx-auto">
-            See what our community of foragers and mushroom enthusiasts have to say about Mushroom SafeGuard.
+            See what our users are saying about their mushroom identification experiences.
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {testimonials.map((testimonial, index) => (
-            <div key={index} className="bg-white rounded-lg p-6 shadow-md border border-gray-100">
-              <div className="flex mb-2">
-                {[...Array(5)].map((_, i) => (
-                  <Star 
-                    key={i} 
-                    size={16} 
-                    className={i < testimonial.rating ? "fill-amber-400 text-amber-400" : "text-gray-300"} 
-                  />
-                ))}
+          {loading ? (
+            Array(3).fill(0).map((_, index) => (
+              <div key={index} className="bg-white rounded-lg p-6 shadow-md border border-gray-100">
+                <div className="flex items-center space-x-4 mb-4">
+                  <Skeleton className="h-16 w-16 rounded-md" />
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-4 w-32" />
+                  </div>
+                </div>
+                <Skeleton className="h-4 w-full mb-2" />
+                <Skeleton className="h-4 w-3/4 mb-2" />
+                <Skeleton className="h-4 w-5/6" />
               </div>
-              <p className="text-gray-700 italic mb-4">"{testimonial.content}"</p>
-              <div className="mt-auto">
-                <p className="font-semibold">{testimonial.name}</p>
-                <p className="text-sm text-mushroom-primary">{testimonial.role}</p>
-              </div>
+            ))
+          ) : recentFeedback.length === 0 ? (
+            <div className="col-span-3 text-center py-8">
+              <MessageSquare className="mx-auto h-12 w-12 text-muted-foreground mb-3" />
+              <h3 className="text-xl font-medium mb-2">No feedback yet</h3>
+              <p className="text-muted-foreground">
+                Be the first to identify a mushroom and share your experience!
+              </p>
             </div>
-          ))}
+          ) : (
+            recentFeedback.map((item) => (
+              <div key={item._id} className="bg-white rounded-lg p-6 shadow-md border border-gray-100">
+                <div className="flex items-center space-x-4 mb-4">
+                  <div className="h-16 w-16 rounded-md overflow-hidden">
+                    <img 
+                      src={item.image?.url} 
+                      alt="Mushroom" 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">{item.user?.name || "User"}</h3>
+                    <span className={`text-sm px-2 py-1 rounded-full ${
+                      item.image?.classification?.classification === 'edible' 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-red-100 text-red-800'
+                    }`}>
+                      {item.image?.classification?.classification || "Unclassified"}
+                    </span>
+                  </div>
+                </div>
+                <p className="text-gray-700 text-sm mb-3">"{item.text}"</p>
+                <p className="text-xs text-muted-foreground">
+                  {new Date(item.date).toLocaleDateString()}
+                </p>
+              </div>
+            ))
+          )}
+        </div>
+        <div className="text-center mt-8">
+          <Button
+            variant="outline"
+            onClick={() => navigate('/identify')}
+          >
+            Try Mushroom Identification
+          </Button>
         </div>
       </section>
 

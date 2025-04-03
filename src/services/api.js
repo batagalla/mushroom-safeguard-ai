@@ -34,4 +34,17 @@ api.updateUserProfile = async (userId, userData) => {
   }
 };
 
+// Add a method to fetch recent feedback for the homepage
+api.get('/feedback/recent', async () => {
+  try {
+    // We're using a direct API call here to bypass authentication for public data
+    const response = await axios.get('http://localhost:5000/api/feedback/recent');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching recent feedback:', error);
+    return [];
+  }
+});
+
 export default api;
+
