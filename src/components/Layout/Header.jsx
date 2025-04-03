@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
@@ -11,10 +11,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Leaf, User, LogOut, Settings, Home } from 'lucide-react';
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Leaf, User, LogOut, Settings, Home, Menu } from 'lucide-react';
 
 const Header = () => {
   const { currentUser, logout, isAdmin } = useAuth();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const closeMobileMenu = () => {
+    setMobileMenuOpen(false);
+  };
 
   return (
     <header className="border-b bg-white dark:bg-gray-900">
@@ -24,6 +30,7 @@ const Header = () => {
           <span className="text-xl font-bold">Mushroom SafeGuard</span>
         </Link>
         
+        {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-6">
           <Link to="/" className="text-sm font-medium hover:text-mushroom-primary">
             Home
@@ -35,6 +42,44 @@ const Header = () => {
             About
           </Link>
         </nav>
+        
+        {/* Mobile Navigation */}
+        <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+          <SheetTrigger asChild className="md:hidden">
+            <Button variant="ghost" size="icon">
+              <Menu className="h-5 w-5" />
+              <span className="sr-only">Toggle menu</span>
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="right" className="w-[250px] md:hidden">
+            <div className="flex flex-col gap-4 py-4">
+              <Link 
+                to="/" 
+                className="text-base font-medium px-4 py-2 hover:bg-gray-100 rounded-md"
+                onClick={closeMobileMenu}
+              >
+                <Home className="inline mr-2 h-4 w-4" />
+                Home
+              </Link>
+              <Link 
+                to="/identify" 
+                className="text-base font-medium px-4 py-2 hover:bg-gray-100 rounded-md"
+                onClick={closeMobileMenu}
+              >
+                <Leaf className="inline mr-2 h-4 w-4" />
+                Identify
+              </Link>
+              <Link 
+                to="/about" 
+                className="text-base font-medium px-4 py-2 hover:bg-gray-100 rounded-md"
+                onClick={closeMobileMenu}
+              >
+                <User className="inline mr-2 h-4 w-4" />
+                About
+              </Link>
+            </div>
+          </SheetContent>
+        </Sheet>
         
         <div className="flex items-center gap-4">
           {currentUser ? (
@@ -81,12 +126,12 @@ const Header = () => {
           ) : (
             <>
               <Link to="/login">
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" className="hidden md:inline-flex">
                   Log In
                 </Button>
               </Link>
               <Link to="/register">
-                <Button size="sm" className="bg-mushroom-primary hover:bg-mushroom-dark">
+                <Button size="sm" className="bg-mushroom-primary hover:bg-mushroom-dark hidden md:inline-flex">
                   Sign Up
                 </Button>
               </Link>
