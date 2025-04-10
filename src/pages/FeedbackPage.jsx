@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
 import MainLayout from '@/components/Layout/MainLayout';
@@ -28,7 +27,6 @@ const FeedbackPage = () => {
     fetchFeedback();
   }, []);
 
-  // Calculate pagination
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = feedback.slice(indexOfFirstItem, indexOfLastItem);
@@ -115,7 +113,7 @@ const FeedbackCard = ({ feedback }) => {
   if (!feedback) return null;
   
   return (
-    <Card>
+    <Card className="overflow-hidden">
       <CardHeader className="pb-2">
         <CardTitle className="text-lg">{feedback.user?.name || 'Anonymous User'}</CardTitle>
         <p className="text-sm text-muted-foreground">
@@ -123,9 +121,9 @@ const FeedbackCard = ({ feedback }) => {
         </p>
       </CardHeader>
       <CardContent>
-        <div className="mb-4">
-          {feedback.image && (
-            <div className="mb-3 relative rounded-md overflow-hidden aspect-video">
+        {feedback.image && (
+          <div className="mb-4">
+            <div className="relative rounded-md overflow-hidden aspect-video mb-3">
               <img 
                 src={feedback.image.url} 
                 alt="Mushroom" 
@@ -141,9 +139,9 @@ const FeedbackCard = ({ feedback }) => {
                 </div>
               )}
             </div>
-          )}
-          <p className="text-sm">{feedback.text}</p>
-        </div>
+            <p className="text-sm">{feedback.text}</p>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

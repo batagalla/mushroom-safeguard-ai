@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Leaf, User, LogOut, Settings, Home, Menu, LogIn, UserPlus } from 'lucide-react';
+import { Leaf, User, LogOut, Settings, Home, Menu, LogIn, UserPlus, MessageSquare } from 'lucide-react';
 
 const Header = () => {
   const { currentUser, logout, isAdmin } = useAuth();
@@ -37,6 +37,9 @@ const Header = () => {
           </Link>
           <Link to="/identify" className="text-sm font-medium hover:text-mushroom-primary">
             Identify
+          </Link>
+          <Link to="/feedback" className="text-sm font-medium hover:text-mushroom-primary">
+            Feedback
           </Link>
           <Link to="/about" className="text-sm font-medium hover:text-mushroom-primary">
             About
@@ -68,6 +71,14 @@ const Header = () => {
               >
                 <Leaf className="inline mr-2 h-4 w-4" />
                 Identify
+              </Link>
+              <Link 
+                to="/feedback" 
+                className="text-base font-medium px-4 py-2 hover:bg-gray-100 rounded-md"
+                onClick={closeMobileMenu}
+              >
+                <MessageSquare className="inline mr-2 h-4 w-4" />
+                Feedback
               </Link>
               <Link 
                 to="/about" 
