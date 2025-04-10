@@ -10,17 +10,17 @@ import ProfileActivity from '@/components/Profile/ProfileActivity';
 import ProfileEditForm from '@/components/Profile/ProfileEditForm';
 
 const ProfilePage = () => {
-  const { currentUser, isAdmin } = useAuth();
+  const { currentUser, isAdmin, loading } = useAuth();
   const { images, fetchUserImages } = useImage();
   const { feedback, fetchFeedback } = useFeedback();
-  const [loading, setLoading] = useState(true);
+  const [pageLoading, setPageLoading] = useState(true);
   const [imageCount, setImageCount] = useState(0);
   const [feedbackCount, setFeedbackCount] = useState(0);
   
   useEffect(() => {
     const loadUserData = async () => {
       if (currentUser) {
-        setLoading(true);
+        setPageLoading(true);
         await fetchUserImages();
         await fetchFeedback();
         
@@ -36,14 +36,27 @@ const ProfilePage = () => {
         
         setImageCount(userImages.length);
         setFeedbackCount(userFeedback.length);
-        setLoading(false);
+        setPageLoading(false);
       }
     };
     
-    loadUserData();
-  }, [currentUser]);
+    if (!loading && currentUser) {
+      loadUserData();
+    } else if (!loading && !currentUser) {
+      setPageLoading(false);
+    }
+  }, [currentUser, loading]);
 
-  if (!currentUser) {
+  // Don't redirect while we're checking auth state
+  if (loading) {
+    return <MainLayout>
+      <div className="container py-12 flex justify-center items-center">
+        <p>Loading your profile...</p>
+      </div>
+    </MainLayout>;
+  }
+
+  if (!loading && !currentUser) {
     return <Navigate to="/login" replace />;
   }
 
@@ -68,7 +81,7 @@ const ProfilePage = () => {
               <ProfileActivity 
                 imageCount={imageCount} 
                 feedbackCount={feedbackCount}
-                loading={loading}
+                loading={pageLoading}
               />
             </TabsContent>
             

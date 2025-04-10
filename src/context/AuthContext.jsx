@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import api from '../services/api';
@@ -16,14 +15,20 @@ export const AuthProvider = ({ children }) => {
     const user = localStorage.getItem('user');
     
     if (token && user) {
-      const userData = JSON.parse(user);
-      setCurrentUser(userData);
-      setIsAdmin(userData.role === 'admin');
+      try {
+        const userData = JSON.parse(user);
+        setCurrentUser(userData);
+        setIsAdmin(userData.role === 'admin');
+      } catch (error) {
+        console.error("Error parsing user data:", error);
+        logout();
+      }
       
       // Verify token validity with backend
       checkAuthStatus();
+    } else {
+      setLoading(false);
     }
-    setLoading(false);
   }, []);
 
   const checkAuthStatus = async () => {
@@ -34,12 +39,14 @@ export const AuthProvider = ({ children }) => {
         setIsAdmin(response.data.role === 'admin');
         localStorage.setItem('user', JSON.stringify(response.data));
       }
+      setLoading(false);
     } catch (error) {
       console.error("Auth verification error:", error);
       // If token is invalid, logout
       if (error.response && error.response.status === 401) {
         logout();
       }
+      setLoading(false);
     }
   };
 
@@ -113,7 +120,7 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider value={value}>
-      {children}
+      {!loading ? children : <div>Loading...</div>}
     </AuthContext.Provider>
   );
 };
