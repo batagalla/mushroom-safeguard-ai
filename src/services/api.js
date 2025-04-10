@@ -34,17 +34,26 @@ api.updateUserProfile = async (userId, userData) => {
   }
 };
 
-// Add a method to fetch recent feedback for the homepage
-api.get('/feedback/recent', async () => {
+// Get public feedback for the homepage
+api.getRecentFeedback = async () => {
   try {
-    // We're using a direct API call here to bypass authentication for public data
     const response = await axios.get('http://localhost:5000/api/feedback/recent');
     return response.data;
   } catch (error) {
     console.error('Error fetching recent feedback:', error);
     return [];
   }
-});
+};
+
+// Get all public feedback for the feedback page
+api.getPublicFeedback = async () => {
+  try {
+    const response = await axios.get('http://localhost:5000/api/feedback/public');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching public feedback:', error);
+    return [];
+  }
+};
 
 export default api;
-
